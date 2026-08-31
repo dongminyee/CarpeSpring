@@ -10,6 +10,7 @@ import com.carpe.backend.service.AdminSyncService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,6 +21,7 @@ public class AdminController {
     private final AdminEmailRepository adminEmailRepository;
     private final AdminSyncService adminSyncService;
 
+    @Scheduled(cron = "0 0 13 * * *", zone = "Asia/Seoul")
     @PostMapping("/whitelist")
     public ResponseEntity<String> addEmail(@RequestBody String email) {
         if (adminEmailRepository.existsByEmail(email)) {
