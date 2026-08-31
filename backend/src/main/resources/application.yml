@@ -1,0 +1,68 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB     # 파일 1개당 허용하는 최대 용량
+      max-request-size: 10MB  # 요청 1번당 허용하는 전체 용량 (여러 장을 동시에 올릴 때 기준)
+  datasource:
+    # Render 환경변수에서 값을 받아오고, 없으면 로컬(localhost) 주소 사용
+    url: ${DB_URL:jdbc:mysql://localhost:3306/carpediem?useSSL=false&serverTimezone=Asia/Seoul}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  h2:
+    console:
+      enabled: true      # 웹 브라우저에서 DB를 볼 수 있게 H2 콘솔 활성화
+      path: /h2-console  # 접속 경로 설정 (예: localhost:8080/h2-console)
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # 엔티티(Java 클래스)를 만들면 자동으로 DB 테이블을 생성 및 수정해 줌
+    show-sql: false      # 터미널에 JPA가 실행하는 실제 SQL 쿼리문을 보여줌
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true # SQL 쿼리를 한 줄이 아니라 보기 좋게 정렬해서 출력
+  
+  jwt:
+    secret: ${JWT_SECRET} 
+  
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: google
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope: profile,email
+
+youtube:
+  api:
+    key: ${YOUTUBE_API_KEY} # 구글 클라우드 콘솔 api key
+    url: "https://www.googleapis.com/youtube/v3/search"
+  channel-id: "UCfKytZeHMKEU0sG6MtI4bgA" # CarpeDiem 채널 ID
+
+file:
+  dir: ${user.dir}/imageContainer/
+
+front:
+  server:
+    dir: ${FRONT_URL}
+
+server:
+  forward-headers-strategy: framework
+
+cloud:
+  r2:
+    endpoint: https://860959853c56b05c69580a7dd2d2ab21.r2.cloudflarestorage.com
+    token-value: ${R2_TOKEN}
+    access-key: ${R2_ACCESS_KEY}
+    secret-key: ${R2_SECRET_KEY}
+    bucket: carpediem-images
+    public-url: https://pub-f783efdfdf50419a8736552015483e7e.r2.dev
+
+
+  
