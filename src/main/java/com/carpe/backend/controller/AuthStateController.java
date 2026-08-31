@@ -73,6 +73,11 @@ public class AuthStateController {
         return ResponseEntity.ok("refreshToken deleted");
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
+
 }
 
 @Data
