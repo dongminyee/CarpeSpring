@@ -60,7 +60,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
 
-        String redirectUrl = UriComponentsBuilder.fromUriString(frontUrl + "/CarpeFront/logIn/index.html")
+        String redirectUrl = UriComponentsBuilder.fromUriString(frontUrl + "/CarpeFront/admin/callback.html")
                 .queryParam("accessToken", access)
                 .queryParam("refreshToken", refresh)
                 .queryParam("role", role)
