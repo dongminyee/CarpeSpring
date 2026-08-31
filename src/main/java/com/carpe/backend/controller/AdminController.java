@@ -21,7 +21,6 @@ public class AdminController {
     private final AdminEmailRepository adminEmailRepository;
     private final AdminSyncService adminSyncService;
 
-    @Scheduled(cron = "0 0 13 * * *", zone = "Asia/Seoul")
     @PostMapping("/whitelist")
     public ResponseEntity<String> addEmail(@RequestBody String email) {
         if (adminEmailRepository.existsByEmail(email)) {
@@ -31,6 +30,7 @@ public class AdminController {
         return ResponseEntity.ok("이메일 추가 완료: " + email);
     }
 
+    @Scheduled(cron = "0 0 13 * * *", zone = "Asia/Seoul")
     @PostMapping("/sync-sheet")
     public ResponseEntity<String> syncSheet() {
         try {
