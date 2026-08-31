@@ -31,7 +31,7 @@ public class AdminSyncService {
     @Transactional
     public void syncAdminsFromSheet() throws Exception {
         // 1. 구글 인증 정보 로드 (resources 폴더 안의 json 파일)
-        InputStream in = new ClassPathResource("google-secret.json").getInputStream();
+        InputStream in = new ClassPathResource("/etc/secrets/google-secret.json").getInputStream();
         GoogleCredentials credentials = GoogleCredentials.fromStream(in)
                 .createScoped(Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY));
 
