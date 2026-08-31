@@ -20,8 +20,7 @@ spring:
       ddl-auto: update   # 엔티티(Java 클래스)를 만들면 자동으로 DB 테이블을 생성 및 수정해 줌
     show-sql: false      # 터미널에 JPA가 실행하는 실제 SQL 쿼리문을 보여줌
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+      hibernate: 
         format_sql: true # SQL 쿼리를 한 줄이 아니라 보기 좋게 정렬해서 출력
   
   jwt:
