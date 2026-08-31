@@ -1,5 +1,6 @@
 package com.carpe.backend.service;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -31,39 +32,49 @@ public class AdminSyncService {
     @Transactional
     public void syncAdminsFromSheet() throws Exception {
         // 1. 구글 인증 정보 로드 (resources 폴더 안의 json 파일)
-        InputStream in = new ClassPathResource("/etc/secrets/google-secret.json").getInputStream();
-        GoogleCredentials credentials = GoogleCredentials.fromStream(in)
-                .createScoped(Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY));
+        InputStream in = new FileInputStream("/etc/secrets/google-secret.json");
 
-        // 2. 구글 시트 서비스 객체 생성
-        Sheets sheetsService = new Sheets.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(),
-                new HttpCredentialsAdapter(credentials))
-                .setApplicationName("CarpeDiem-Admin-Sync")
-                .build();
+        try (in) {
+            GoogleCredentials credentials = GoogleCredentials.fromStream(in)
+                    .createScoped(Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY));
 
-        // 3. 시트 데이터 가져오기 (예: '시트1'의 A열 2행부터 끝까지 가져오기)
-        String range = "전체!G2:G";
-        ValueRange response = sheetsService.spreadsheets().values()
-                .get(SPREADSHEET_ID, range)
-                .execute();
+            // 2. 구글 시트 서비스 객체 생성
+            Sheets sheetsService = new Sheets.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance(),
+                    new HttpCredentialsAdapter(credentials))
+                    .setApplicationName("CarpeDiem-Admin-Sync")
+                    .build();
 
-        List<List<Object>> values = response.getValues();
+            // 3. 시트 데이터 가져오기
+            String range = "전체!G2:G";
+            ValueRange response = sheetsService.spreadsheets().values()
+                    .get(SPREADSHEET_ID, range)
+                    .execute();
 
-        if (values == null || values.isEmpty()) {
-            System.out.println("데이터가 없습니다.");
-            return;
-        }
+            List<List<Object>> values = response.getValues();
 
-        // 4. 추출한 이메일들을 DB에 반영
-        for (List<Object> row : values) {
-            if (!row.isEmpty()) {
-                String email = row.get(0).toString().trim();
-                // DB에 해당 이메일의 유저가 있는지 확인
-                if (!adminEmailRepository.existsByEmail(email)) {
-                    AdminEmail newAdmin = new AdminEmail(email);
-                    adminEmailRepository.save(newAdmin);
+            if (values == null || values.isEmpty()) {
+                System.out.println("데이터가 없습니다.");
+                return;
+            }
+
+            /*
+             * 💡 참고: 만약 시트에서 삭제된 이메일을 DB에서도 지워야 하는 '완벽한 동기화'가 필요하다면,
+             * DB에 있는 모든 이메일을 먼저 불러온 뒤 시트 목록과 비교해서
+             * 시트에 없는 이메일을 adminEmailRepository.delete() 하는 로직이 추가로 필요합니다.
+             */
+
+            // 4. 추출한 이메일들을 DB에 반영
+            for (List<Object> row : values) {
+                if (!row.isEmpty() && row.get(0) != null) {
+                    String email = row.get(0).toString().trim();
+
+                    // ⭐️ 이메일이 완전한 빈 칸이 아닐 때만 저장
+                    if (!email.isEmpty() && !adminEmailRepository.existsByEmail(email)) {
+                        AdminEmail newAdmin = new AdminEmail(email);
+                        adminEmailRepository.save(newAdmin);
+                    }
                 }
             }
         }
