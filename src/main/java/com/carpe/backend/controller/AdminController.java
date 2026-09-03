@@ -8,12 +8,14 @@ import com.carpe.backend.repository.AdminEmailRepository;
 import com.carpe.backend.service.AdminSyncService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class AdminController {
     public ResponseEntity<String> syncSheet() {
         try {
             adminSyncService.syncAdminsFromSheet();
+            log.info("구글 시트 DB 동기화 성공");
             return ResponseEntity.ok("구글 시트의 관리자 명단이 DB에 성공적으로 동기화되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("동기화 실패: " + e.getMessage());
